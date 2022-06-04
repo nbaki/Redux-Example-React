@@ -10,13 +10,23 @@
 */
 
 const initialState = {
-  registeredClasses: []
+  registeredClasses: [],
+  isLoading: false,
+  classroomOptions: [],
+  alertMessage: '',
+  alertType: ''
 }
 
 const classroomReducer = (state = initialState, action) => {
   switch(action.type) {
     case 'REGISTER_CLASS':
       return { ...state, registeredClasses: [...state.registeredClasses, action.addedClass] };
+    case 'LOAD_CLASSROOMS':
+      return { ...state, isLoading: true };
+    case 'SAVE_CLASSROOMS':
+      return { ...state, isLoading: false, classroomOptions: action.classroomOptions };
+    case 'SHOW_ALERT':
+      return { ...state, isLoading: false, alertMessage: action.message, alertType: action.alertType };
     default:
       return initialState; // {} redux provides empty to start with
   }

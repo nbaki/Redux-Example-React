@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { registerClass } from './redux/ClassroomActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerClass, getClassroomOptions } from './redux/ClassroomActions';
+import { Form, Spinner, FormGroup, Label, Input, Alert, Button, Card, CardBody, CardHeader, CardTitle, ButtonGroup } from 'reactstrap';
 
 const TIMER = 60;
 
 function Registration(props) {
   const [registrationTimer, setRegistrationTimer] = useState(TIMER);
-  const [timerIntervalCallback, setTimerIntervalCallback] = useState();
+  const intervalCallback = () => {
+    setRegistrationTimer(timer => timer - 1); // subtract 1 every second
+  };
   const [timerInterval, setTimerInterval] = useState();
   const [registrationData, setRegistrationData] = useState({});
+  const [registerMessage, setRegisterMessage] = useState();
 
   const dispatch = useDispatch(); // returns a dispatcher function
+  const loading = useSelector(state => state.isLoading);
+  const classroomOptions = useSelector(state => state.classroomOptions);
+  // console.log('loading is', loading);
 
   /* Lifecycle methods 
     - first time it renders
@@ -26,20 +33,16 @@ function Registration(props) {
     Return a function out of useEffect -- this is considered the cleanup function
   */
 
-  // Run this side effect anytme 'registrationTimer' changes
+  // Run this side effect anytime 'registrationTimer' changes
   useEffect(() => {
-    console.log("running sideeffect")
     if (registrationTimer === 0) {
       // remove the interval
       clearInterval(timerInterval);
-    } else if (registrationTimer === TIMER) {
-      // setInterval(timerInterval);
-      console.log('timercallback', timerIntervalCallback);
-      setInterval(timerIntervalCallback, 1000) // ms
-  
-      // setTimerInterval(interval);
+      setTimerInterval(0);
+    } else if (registrationTimer === TIMER && timerInterval === 0) {
+      setTimerInterval(setInterval(intervalCallback, 1000)) // ms
     }
-  }, [registrationTimer, timerIntervalCallback]);
+  }, [registrationTimer]);
 
   // this side effect runs during every single re-render
   // useEffect(() => {
@@ -48,16 +51,13 @@ function Registration(props) {
 
   useEffect(() => {
     // setTimeout() = Runs some code after some time elapses
-    const intervalCallback = () => {
-      setRegistrationTimer(timer => timer - 1); // subtract 1 every second
-    };
-    const interval = setInterval(intervalCallback, 1000) // ms
+    dispatch(getClassroomOptions()); // go get classroom data
 
-    setTimerIntervalCallback(intervalCallback);
-    setTimerInterval(interval);
+    setTimerInterval(setInterval(intervalCallback, 1000)) // ms
+
     // Cleanup when component unmounts
     return () => {
-      clearInterval(interval);
+      clearInterval(timerInterval);
     }
   }, []); // Empty array [] is equivalent to running the side effect of the first component render
 
@@ -69,11 +69,11 @@ function Registration(props) {
       -- Clear the HTML
   */
 
-  const handleSubmit = (event) => {
-    // Trigger an action in redux
-    event.preventDefault();
-    console.log(registrationData);
+  const handleSubmit = () => {
+    // console.log(registrationData);
+    setRegisterMessage('You have successfully registered for this class');
 
+    // Trigger an action in redux
     dispatch(registerClass(registrationData)); // officially dispatch our 'registerClass' action
   }
 
@@ -93,32 +93,52 @@ function Registration(props) {
     }
     setRegistrationData(prevState => ({...prevState, ...data}));
   }
+
+  const displayClassroomOptions = () => {
+    if (classroomOptions.length) {
+      return classroomOptions.map(classroom => {
+        return <option key={classroom.id} value={classroom.id}>{classroom.subject}</option>
+      })
+    }
+  }
+
+  console.log('classroom options are', classroomOptions);
+
   return (
-    <section id="registration-form">
-      <h1>Welcome! Please register for your class.</h1>
-      <h2>You have {registrationTimer} seconds to register.</h2>
+    <Card>
+      <CardHeader tag="h2">
+        Welcome! Please register for your class.
+      </CardHeader>
+      <CardBody>
+        <CardTitle tag="h3" className="text-center">
+          You have {registrationTimer} seconds to register.
+        </CardTitle>
+        {loading && <Spinner />}
 
-      {/* Conditional Rendering */}
-      { registrationTimer > 0 &&
-        <form onSubmit={handleSubmit}>
-          <label>Class:</label>
-          <select onChange={handleClassSelection}>
-            <option>-- Select a class --</option>
-            <option value="React">React</option>
-            <option value="Bootstrap">Bootstrap</option>
-            <option value="HTML">HTML</option>
-          </select>
-          <br />
-          <label>Name:</label>
-          <input type="text" placeholder="Enter name" onKeyUp={handleName} /><br />
-          <input type="submit" value="Register" />
-        </form>
-      }
-
-      <br /><br /><br />
-      <button onClick={() => setRegistrationTimer(data => data - 1)}>Manual Countdown</button>
-      <button onClick={() => setRegistrationTimer(TIMER)}>Reset Countdown</button>
-    </section>
+        {registerMessage && <Alert toggle={() => setRegisterMessage(null)} color="success">{registerMessage}</Alert>}
+        {/* Conditional Rendering */}
+        {registrationTimer > 0 && <Form>
+          <FormGroup>
+            <Label for="subject">
+              Subject
+            </Label>
+            <Input type="select" id="subject" onChange={handleClassSelection}>
+              <option>-- Select a class --</option>
+              {displayClassroomOptions()}
+            </Input>
+          </FormGroup>
+          <FormGroup>
+            <Label for="registrant-name">Registrant Name</Label>
+            <Input onKeyUp={handleName} />
+          </FormGroup>
+          <Button color="success" onClick={handleSubmit}>Register</Button>
+        </Form>}
+      </CardBody>
+      <ButtonGroup>
+        <Button color="primary" onClick={() => setRegistrationTimer(data => data - 1)}>Manual Countdown</Button>
+        <Button color="info" onClick={() => setRegistrationTimer(TIMER)}>Reset Countdown</Button>
+      </ButtonGroup>
+    </Card>
   )
 };
 

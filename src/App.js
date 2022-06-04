@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Classroom from './Classroom';
-import { Link } from 'react-router-dom';
+import { NavLink as RRNavLink } from 'react-router-dom';
+import { Navbar, NavbarBrand, NavbarToggle, NavLink, Collapse, Nav, NavItem, NavbarToggler } from 'reactstrap';
 
 function App() {
   const [loadedStudents, setLoadedStudents] = useState(0);
@@ -11,13 +12,28 @@ function App() {
   }
   return (
     <div className="App">
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/classrooms">Classrooms</Link></li>
-        <li><Link to="/registration">Registration</Link></li>
-      </ul>
+      <Navbar color="light" expand="md" light className="mb-5">
+        <NavbarBrand href="/">
+          Classroom Management
+        </NavbarBrand>
+        <NavbarToggler onClick={() => {}} />
+        <Collapse navbar>
+          <Nav className="me-auto" navbar>
+            <NavItem>
+              <NavLink tag={RRNavLink} to="/classrooms">Classrooms</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink tag={RRNavLink} to="/registration">Register</NavLink>
+            </NavItem>
+            {/* <NavItem>
+              <button onClick={handleLoadStudents}>Load Students</button>
+            </NavItem> */}
+          </Nav>
+        </Collapse>
+      </Navbar>
+
       {/* <Classroom numOfStudents={loadedStudents} myData={123} foo="bar" /> */}
-      <button onClick={handleLoadStudents}>Load Students</button>
+      
     </div>
   );
 }

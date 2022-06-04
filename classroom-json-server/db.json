@@ -1,0 +1,57 @@
+{
+  "classrooms": [
+    {
+      "id": 0,
+      "subject": "React"
+    },
+    {
+      "id": 1,
+      "subject": "Bootstrap"
+    },
+    {
+      "id": 2,
+      "subject": "HTML"
+    },
+    {
+      "id": 3,
+      "subject": "React Native"
+    },
+    {
+      "subject": "Comp Sci 101",
+      "id": 7
+    },
+    {
+      "subject": "Comp Sci 201",
+      "id": 8
+    },
+    {
+      "subject": "Comp Sci 300",
+      "id": 9
+    },
+    {
+      "subject": "ASDF",
+      "id": 10
+    },
+    {
+      "subject": "ASDF",
+      "id": 11
+    },
+    {
+      "subject": "Comp Sci 500",
+      "id": 12
+    },
+    {
+      "subject": "Comp Sci 600",
+      "id": 13
+    },
+    {
+      "subject": "TEST SUBJECT",
+      "id": 14
+    },
+    {
+      "subject": "Another Subject",
+      "id": 15
+    }
+  ],
+  "registeredClasses": []
+}
